@@ -5,8 +5,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/knq/snaker"
 	"github.com/jackielii/xo/models"
+	"github.com/knq/snaker"
 )
 
 // NewTemplateFuncs returns a set of template funcs bound to the supplied args.
@@ -32,6 +32,10 @@ func (a *ArgType) NewTemplateFuncs() template.FuncMap {
 		"hascolumn":          a.hascolumn,
 		"hasfield":           a.hasfield,
 		"getstartcount":      a.getstartcount,
+		"sqltogotype":        a.sqltogotype,
+		"sqltogql":           a.sqltogql,
+		"togqlname":          a.togqlname,
+		"sqltogqltype":       a.sqltogqltype,
 	}
 }
 
@@ -634,4 +638,71 @@ func (a *ArgType) hasfield(fields []*Field, name string) bool {
 // getstartcount returns a starting count for numbering columsn in queries
 func (a *ArgType) getstartcount(fields []*Field, pkFields []*Field) int {
 	return len(fields) - len(pkFields)
+}
+
+var sqlToGoTypeMap = map[string]string{
+	"string":         "string",
+	"bool":           "bool",
+	"int64":          "graphql.ID",
+	"int":            "graphql.ID",
+	"sql.NullString": "*string",
+	"sql.NullBool":   "*bool",
+	"pq.NullTime":    "*graphql.Time",
+	"sql.NullInt64":  "*graphql.ID",
+}
+
+func (a *ArgType) sqltogotype(typ string) string {
+	if ret, ok := sqlToGoTypeMap[typ]; ok {
+		return ret
+	}
+	panic("in funcs.go define sqltogotype for: " + typ)
+}
+
+func (a *ArgType) sqltogql(typ, field string) string {
+	switch typ {
+	case "int":
+		return "graphql.ID(strconv.Itoa(" + field + "))"
+	case "int64":
+		return "graphql.ID(strconv.FormatInt(" + field + ", 10))"
+	case "string":
+		return field
+	case "bool":
+		return field
+	case "sql.NullString":
+		return "PointerString(" + field + ")"
+	case "sql.NullBool":
+		return "PointerBool(" + field + ")"
+	case "pq.NullTime":
+		return "PointerGqlTime(" + field + ")"
+	case "sql.NullInt64":
+		return "PointerGqlIDSqlInt64(" + field + ")"
+	default:
+		panic("in funcs.go define sqltogql for: " + typ)
+	}
+}
+
+var sqlToGqlTypeMap = map[string]string{
+	"string":         "String!",
+	"bool":           "Boolean!",
+	"int64":          "ID!",
+	"int":            "ID!",
+	"sql.NullString": "String",
+	"sql.NullBool":   "Boolean",
+	"pq.NullTime":    "Time",
+	"sql.NullInt64":  "ID",
+}
+
+// togqlname turns CamelCase to camelCase
+func (a *ArgType) togqlname(s string) string {
+	if s == "ID" {
+		return "id"
+	}
+	return strings.ToLower(s[0:1]) + s[1:]
+}
+
+func (a *ArgType) sqltogqltype(typ string) string {
+	if ret, ok := sqlToGqlTypeMap[typ]; ok {
+		return ret
+	}
+	panic("in funcs.go define sqltogotype for: " + typ)
 }
