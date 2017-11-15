@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/knq/xo/examples/pgcatalog/pgtypes"
+	"github.com/jackielii/xo/examples/pgcatalog/pgtypes"
 	"github.com/lib/pq"
 )
 
