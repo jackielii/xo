@@ -5,6 +5,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/gedex/inflector"
 	"github.com/jackielii/xo/models"
 	"github.com/knq/snaker"
 )
@@ -32,6 +33,8 @@ func (a *ArgType) NewTemplateFuncs() template.FuncMap {
 		"hascolumn":          a.hascolumn,
 		"hasfield":           a.hasfield,
 		"getstartcount":      a.getstartcount,
+		"plural":             a.plural,
+		"singular":           a.singular,
 		"sqltogotype":        a.sqltogotype,
 		"sqltogql":           a.sqltogql,
 		"togqlname":          a.togqlname,
@@ -638,6 +641,14 @@ func (a *ArgType) hasfield(fields []*Field, name string) bool {
 // getstartcount returns a starting count for numbering columsn in queries
 func (a *ArgType) getstartcount(fields []*Field, pkFields []*Field) int {
 	return len(fields) - len(pkFields)
+}
+
+func (a *ArgType) plural(s string) string {
+	return inflector.Pluralize(s)
+}
+
+func (a *ArgType) singular(s string) string {
+	return inflector.Singularize(s)
 }
 
 var sqlToGoTypeMap = map[string]string{
