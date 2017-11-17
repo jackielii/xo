@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"text/template"
@@ -39,6 +40,7 @@ func (a *ArgType) NewTemplateFuncs() template.FuncMap {
 		"sqltogql":           a.sqltogql,
 		"togqlname":          a.togqlname,
 		"sqltogqltype":       a.sqltogqltype,
+		"gotosql":            a.gotosql,
 	}
 }
 
@@ -654,31 +656,43 @@ func (a *ArgType) singular(s string) string {
 var sqlToGoTypeMap = map[string]string{
 	"string":         "string",
 	"bool":           "bool",
-	"int64":          "graphql.ID",
-	"int":            "graphql.ID",
+	"int64":          "string",
+	"int":            "string",
+	"time.Time":      "graphql.Time",
 	"sql.NullString": "*string",
 	"sql.NullBool":   "*bool",
 	"pq.NullTime":    "*graphql.Time",
-	"sql.NullInt64":  "*graphql.ID",
+	"sql.NullInt64":  "*string",
 }
 
-func (a *ArgType) sqltogotype(typ string) string {
+func (a *ArgType) sqltogotype(typ string, isPK bool) string {
+	if isPK {
+		return "graphql.ID"
+	}
 	if ret, ok := sqlToGoTypeMap[typ]; ok {
 		return ret
 	}
 	panic("in funcs.go define sqltogotype for: " + typ)
 }
 
-func (a *ArgType) sqltogql(typ, field string) string {
+func (a *ArgType) sqltogql(typ, field string, isPK bool) string {
+	if isPK && typ == "int64" {
+		return "graphql.ID(strconv.FormatInt(" + field + ", 10))"
+	}
+	if isPK {
+		return "graphql.ID(strconv.Itoa(" + field + "))"
+	}
 	switch typ {
 	case "int":
-		return "graphql.ID(strconv.Itoa(" + field + "))"
+		return "strconv.Itoa(" + field + ")"
 	case "int64":
-		return "graphql.ID(strconv.FormatInt(" + field + ", 10))"
+		return "strconv.FormatInt(" + field + ", 10)"
 	case "string":
 		return field
 	case "bool":
 		return field
+	case "time.Time":
+		return "graphql.Time{ " + field + " }"
 	case "sql.NullString":
 		return "PointerString(" + field + ")"
 	case "sql.NullBool":
@@ -686,21 +700,10 @@ func (a *ArgType) sqltogql(typ, field string) string {
 	case "pq.NullTime":
 		return "PointerGqlTime(" + field + ")"
 	case "sql.NullInt64":
-		return "PointerGqlIDSqlInt64(" + field + ")"
+		return "PointerStringSqlInt64(" + field + ")"
 	default:
 		panic("in funcs.go define sqltogql for: " + typ)
 	}
-}
-
-var sqlToGqlTypeMap = map[string]string{
-	"string":         "String!",
-	"bool":           "Boolean!",
-	"int64":          "ID!",
-	"int":            "ID!",
-	"sql.NullString": "String",
-	"sql.NullBool":   "Boolean",
-	"pq.NullTime":    "Time",
-	"sql.NullInt64":  "ID",
 }
 
 // togqlname turns CamelCase to camelCase
@@ -711,9 +714,51 @@ func (a *ArgType) togqlname(s string) string {
 	return strings.ToLower(s[0:1]) + s[1:]
 }
 
-func (a *ArgType) sqltogqltype(typ string) string {
+var sqlToGqlTypeMap = map[string]string{
+	"string":         "String!",
+	"bool":           "Boolean!",
+	"int64":          "String!",
+	"int":            "String!",
+	"time.Time":      "Time!",
+	"sql.NullString": "String",
+	"sql.NullBool":   "Boolean",
+	"pq.NullTime":    "Time",
+	"sql.NullInt64":  "String",
+}
+
+func (a *ArgType) sqltogqltype(typ string, isPK bool) string {
+	if isPK {
+		return "ID!"
+	}
 	if ret, ok := sqlToGqlTypeMap[typ]; ok {
 		return ret
 	}
-	panic("in funcs.go define sqltogotype for: " + typ)
+	panic("in funcs.go define sqltogqltype for: " + typ)
+}
+
+func (a *ArgType) gotosql(typ, field string) string {
+	switch typ {
+	case "int":
+		return field
+	case "int64":
+		return field
+	case "string":
+		return field
+	case "bool":
+		return field
+	case "time.Time":
+		return fmt.Sprintf("time.Time{ Time: " + field + " }")
+	case "sql.NullBool":
+		return fmt.Sprintf("BoolPointer(%s)", field)
+	case "sql.NullString":
+		return fmt.Sprintf("StringPointer(%s)", field)
+	case "pq.NullTime":
+		return fmt.Sprintf("TimeGqlPointer(%s)", field)
+	default:
+		panic("in funcs.go define gotosql for: " + typ)
+	}
+}
+
+func (a *ArgType) gqlidtosql(typ, field string) string {
+	return ""
 }

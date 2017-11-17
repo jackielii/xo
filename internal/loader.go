@@ -6,9 +6,8 @@ import (
 	"strings"
 
 	"github.com/gedex/inflector"
-
-	"github.com/knq/snaker"
 	"github.com/jackielii/xo/models"
+	"github.com/knq/snaker"
 )
 
 // Loader is the common interface for database drivers that can generate code
@@ -288,6 +287,14 @@ func (tl TypeLoader) LoadSchema(args *ArgType) error {
 		return err
 	}
 
+	// generate table templates
+	for _, t := range tableMap {
+		err = args.ExecuteTemplate(TypeTemplate, t.Name, "", t)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -487,14 +494,6 @@ func (tl TypeLoader) LoadRelkind(args *ArgType, relType RelType) (map[string]*Ty
 		tableMap[ti.TableName] = typeTpl
 	}
 
-	// generate table templates
-	for _, t := range tableMap {
-		err = args.ExecuteTemplate(TypeTemplate, t.Name, "", t)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	return tableMap, nil
 }
 
@@ -684,6 +683,7 @@ func (tl TypeLoader) LoadTableIndexes(args *ArgType, typeTpl *Type, ixMap map[st
 		return err
 	}
 
+	var indexes []*Index
 	// process indexes
 	for _, ix := range indexList {
 		// save whether or not the primary key index was processed
@@ -707,6 +707,8 @@ func (tl TypeLoader) LoadTableIndexes(args *ArgType, typeTpl *Type, ixMap map[st
 		args.BuildIndexFuncName(ixTpl)
 
 		ixMap[typeTpl.Table.TableName+"_"+ix.IndexName] = ixTpl
+
+		indexes = append(indexes, ixTpl)
 	}
 
 	// search for primary key if it was skipped being set in the type
@@ -725,7 +727,7 @@ func (tl TypeLoader) LoadTableIndexes(args *ArgType, typeTpl *Type, ixMap map[st
 	// sqlite doesn't define primary keys in its index list
 	if args.LoaderType != "ora" && !priIxLoaded && pk != nil {
 		ixName := typeTpl.Table.TableName + "_" + pk.Col.ColumnName + "_pkey"
-		ixMap[ixName] = &Index{
+		ixTpl := &Index{
 			FuncName: typeTpl.Name + "By" + pk.Name,
 			Schema:   args.Schema,
 			Type:     typeTpl,
@@ -736,8 +738,11 @@ func (tl TypeLoader) LoadTableIndexes(args *ArgType, typeTpl *Type, ixMap map[st
 				IsPrimary: true,
 			},
 		}
+		ixMap[ixName] = ixTpl
+		indexes = append(indexes, ixTpl)
 	}
 
+	typeTpl.Indexes = indexes
 	return nil
 }
 
