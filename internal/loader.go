@@ -292,7 +292,13 @@ func (tl TypeLoader) LoadSchema(args *ArgType) error {
 	}
 
 	// generate table templates
+LOOP:
 	for _, t := range tableMap {
+		for _, ignored := range args.IgnoreTables {
+			if ignored == t.Table.TableName {
+				continue LOOP
+			}
+		}
 		err = args.ExecuteTemplate(TypeTemplate, t.Name, "", t)
 		if err != nil {
 			return err

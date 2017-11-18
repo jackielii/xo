@@ -39,6 +39,11 @@ func (a *ArgType) TemplateSet() *TemplateSet {
 func (a *ArgType) ExecuteTemplate(tt TemplateType, name string, sub string, obj interface{}) error {
 	var err error
 
+	for _, ignored := range a.IgnoreTables {
+		if SingularizeIdentifier(ignored) == name { // FIXME: do this properly please
+			return err
+		}
+	}
 	// setup generated
 	if a.Generated == nil {
 		a.Generated = []TBuf{}
