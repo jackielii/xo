@@ -287,12 +287,17 @@ func (tl TypeLoader) LoadSchema(args *ArgType) error {
 		return err
 	}
 
+	if args.TypeMap == nil {
+		args.TypeMap = make(map[string]bool)
+	}
+
 	// generate table templates
 	for _, t := range tableMap {
 		err = args.ExecuteTemplate(TypeTemplate, t.Name, "", t)
 		if err != nil {
 			return err
 		}
+		args.TypeMap[t.Name] = true
 	}
 
 	return nil
