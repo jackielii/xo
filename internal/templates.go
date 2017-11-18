@@ -8,7 +8,7 @@ import (
 	"path"
 	"text/template"
 
-	templates "github.com/jackielii/xo/tplbin"
+	templates "gitlab.com/tesgo/core/pkg/xo/tplbin"
 )
 
 // TemplateLoader loads templates from the specified name.

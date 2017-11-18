@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/jackielii/xo/models"
+import "gitlab.com/tesgo/core/pkg/xo/models"
 
 // TemplateType represents a template type.
 type TemplateType uint

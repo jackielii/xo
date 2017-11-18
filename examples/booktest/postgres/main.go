@@ -10,7 +10,7 @@ import (
 
 	"github.com/knq/dburl"
 
-	"github.com/jackielii/xo/examples/booktest/postgres/models"
+	"gitlab.com/tesgo/core/pkg/xo/examples/booktest/postgres/models"
 )
 
 var flagVerbose = flag.Bool("v", false, "verbose")

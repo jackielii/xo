@@ -3,8 +3,8 @@ package loaders_test
 import (
 	"testing"
 
-	"github.com/jackielii/xo/internal"
-	"github.com/jackielii/xo/loaders"
+	"gitlab.com/tesgo/core/pkg/xo/internal"
+	"gitlab.com/tesgo/core/pkg/xo/loaders"
 )
 
 func Test_MyParseType(t *testing.T) {

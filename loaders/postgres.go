@@ -9,8 +9,8 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/knq/snaker"
-	"github.com/jackielii/xo/internal"
-	"github.com/jackielii/xo/models"
+	"gitlab.com/tesgo/core/pkg/xo/internal"
+	"gitlab.com/tesgo/core/pkg/xo/models"
 )
 
 func init() {

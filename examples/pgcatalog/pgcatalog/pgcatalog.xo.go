@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jackielii/xo/examples/pgcatalog/pgtypes"
+	"gitlab.com/tesgo/core/pkg/xo/examples/pgcatalog/pgtypes"
 	"github.com/lib/pq"
 )
 

@@ -6,8 +6,8 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/jackielii/xo/internal"
-	"github.com/jackielii/xo/models"
+	"gitlab.com/tesgo/core/pkg/xo/internal"
+	"gitlab.com/tesgo/core/pkg/xo/models"
 )
 
 func init() {

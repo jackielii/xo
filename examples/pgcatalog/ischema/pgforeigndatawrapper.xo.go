@@ -6,7 +6,7 @@ package ischema
 import (
 	"database/sql"
 
-	"github.com/jackielii/xo/examples/pgcatalog/pgtypes"
+	"gitlab.com/tesgo/core/pkg/xo/examples/pgcatalog/pgtypes"
 )
 
 // PgForeignDataWrapper represents a row from 'information_schema._pg_foreign_data_wrappers'.

@@ -17,7 +17,7 @@ import (
 var (
 	flagPath = flag.String(
 		"path",
-		os.Getenv("GOPATH")+"/src/github.com/jackielii/xo/examples/pokedex/pokedex/pokedex/data",
+		os.Getenv("GOPATH")+"/src/gitlab.com/tesgo/core/pkg/xo/examples/pokedex/pokedex/pokedex/data",
 		"path",
 	)
 )

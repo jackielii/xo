@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/gedex/inflector"
-	"github.com/jackielii/xo/models"
+	"gitlab.com/tesgo/core/pkg/xo/models"
 	"github.com/knq/snaker"
 )
 

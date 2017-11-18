@@ -11,7 +11,7 @@ import (
 	"github.com/knq/dburl"
 	"github.com/knq/xoutil"
 
-	"github.com/jackielii/xo/examples/booktest/sqlite3/models"
+	"gitlab.com/tesgo/core/pkg/xo/examples/booktest/sqlite3/models"
 )
 
 var flagVerbose = flag.Bool("v", false, "verbose")

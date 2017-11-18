@@ -17,10 +17,10 @@ import (
 	"github.com/alexflint/go-arg"
 
 	"github.com/knq/dburl"
-	"github.com/jackielii/xo/internal"
-	"github.com/jackielii/xo/models"
+	"gitlab.com/tesgo/core/pkg/xo/internal"
+	"gitlab.com/tesgo/core/pkg/xo/models"
 
-	_ "github.com/jackielii/xo/loaders"
+	_ "gitlab.com/tesgo/core/pkg/xo/loaders"
 	_ "github.com/knq/xoutil"
 )
 
